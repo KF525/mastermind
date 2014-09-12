@@ -14,22 +14,56 @@ class MasterMind
   def initialize
     @all_colors = ["red", "blue", "black", "yellow", "green", "white", "orange", "brown"]
     @answer = answer
-    @guess = []
+    @guess = [ ]
   end
 
   def answer
     @all_colors.sample(4)
   end
 
-  def make_guess_array(guessed_colors)
-    @guess << guessed_colors
-    check_guess
+  def guess_to_array
+    if !@all_colors.include?(@user_guess)
+      puts "That's not a color."
+      get_guess
+    else
+      @guess << @user_guess
+      get_guess
+    end
   end
 
-  def check_guess
+  def get_guess
+    if @guess.length <= 3
+      puts "Choose a color."
+      @user_guess = gets.chomp.downcase
+      puts @guess.length.inspect
+      guess_to_array
+    else
+      return_answers
+    end
+  end
+
+  def return_answers
+    puts "HELLO!"
     if @answer == @guess
+      puts "You win!"
+    end
+
+    if @answer.include?(@guess)
       puts "true"
     end
+    #right_color = 0
+
+    @answer.each_with_index do |color, index|
+      if @guess == color
+        puts "true"
+      end
+    end
+    # @answer.each_with_index do |color, index|
+    #   if @guess[index] == color[index]
+    #     right_order += 1
+    #     puts right_order
+    #   end
+    # end
   end
 
   def board
@@ -38,21 +72,10 @@ class MasterMind
 end
 
 def run
-  new_game = MasterMind.new
-  puts new_game.board
-  puts new_game.inspect
-  puts "What is your color choice for spot one?"
-  guess = gets.chomp.downcase
-  new_game.make_guess_array(guess)
-  puts "What is your color choice for spot two?"
-  guess = gets.chomp.downcase
-  new_game.make_guess_array(guess)
-  puts "What is your color choice for spot three?"
-  guess = gets.chomp.downcase
-  new_game.make_guess_array(guess)
-  puts "What is your color choice for spot four?"
-  guess = gets.chomp.downcase
-  new_game.make_guess_array(guess)
+  #until false
+    new_game = MasterMind.new
+    new_game.get_guess
+  #end
 end
 
 run
