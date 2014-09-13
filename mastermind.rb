@@ -46,9 +46,11 @@ class MasterMind
   end
 
   def guess_to_array
-    if !@all_colors.include?(@user_guess)
+    if !@all_colors.include?(@user_guess) && @user_guess != "quit"
       puts "That's not a color."
       get_guess
+    elsif @user_guess == "quit"
+      abort("You have ended the game.")
     else
       @guess << @user_guess
       colorize_pieces
@@ -143,12 +145,14 @@ end
 def run
     mm = MasterMind.new
 
+    puts "There is a secret combination of 4 colors."
+    puts "You must try and guess the secret combination to win."
+    puts "To quit the game just type QUIT."
     puts "What level of difficulty would you like: easy, medium, hard?"
     level = gets.chomp.downcase
     mm.level_of_difficulty(level)
 
   until mm.over == true
-    puts mm.inspect
     puts mm.board
     mm.reset_results
     mm.get_guess
