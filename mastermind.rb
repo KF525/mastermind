@@ -2,19 +2,19 @@
 #DONEcreate a random combination of 4 colors from 8 colors
 #DONEallow for guesses
 #DONErespond to guesses - number of correct colors and number of colors in correct order
+#DONEoption to increase difficulty/reduce number of guesses
+#DONEif guess correctly => jumps to win
+#DONEinclude colorize option
 
 #create a board/reprint board
-
 #a way to quit the game
-#an end to the game
-#option to increase difficulty/reduce number of guesses
-#inclide colorize option
+
 
 require 'colorize'
 
 class MasterMind
   def initialize
-    @all_colors = ["red", "blue", "black", "yellow", "green", "white", "orange", "brown"]
+    @all_colors = ["red", "blue", "black", "yellow", "green", "white", "magenta", "cyan"]
     @answer = answer
     @guess = [ ]
     @number_of_guesses = 0
@@ -22,10 +22,22 @@ class MasterMind
     @lose = false
     @right_color = 0
     @right_order = 0
+    @level = 10
+    @game_piece = nil
+    @row = []
+    @old_row = nil
   end
 
   def answer
     @all_colors.sample(4)
+  end
+
+  def colorize
+    add_color = @user_guess.to_sym
+
+    @game_piece = "O".colorize(add_color)
+    @row << @game_piece
+    get_guess
   end
 
   def guess_to_array
@@ -34,7 +46,7 @@ class MasterMind
       get_guess
     else
       @guess << @user_guess
-      get_guess
+      colorize
     end
   end
 
@@ -48,8 +60,21 @@ class MasterMind
     end
   end
 
+  def level_of_difficulty(level)
+
+    if level.include?("easy")
+      @level = 10
+    elsif level.include?("medium")
+      @level = 8
+    elsif level.include?("hard")
+      @level = 5
+    else
+      puts "I'm sorry. I don't understand."
+    end
+  end
+
   def number_of_guesses
-    if @number_of_guesses <= 8
+    if @number_of_guesses <= @level
       @number_of_guesses += 1
     else
       lose
@@ -58,31 +83,22 @@ class MasterMind
   end
 
   def return_results
+    #look into a shorter way to do this?
       @answer.each_with_index do |color, index|
         if @guess.include?(color)
           @right_color += 1
         end
       end
 
-      if @guess[0] == @answer[0]
-        @right_order += 1
+      @answer.each_with_index do |color, index|
+        if @guess[index] == @answer[index]
+          @right_order += 1
+        end
       end
 
-      if @guess[1] == @answer[1]
-        @right_order += 1
+      if @answer == @guess
+        win
       end
-
-      if @guess[2] == @answer[2]
-        @right_order += 1
-      end
-
-      if @guess[3] == @answer[3]
-        @right_order += 1
-      end
-
-      # if @right_order == 4
-      #   win
-      # end
 
       puts "You have #{@right_color} correct colors."
       puts "And #{@right_order} in the correct spot."
@@ -95,27 +111,45 @@ class MasterMind
   end
 
   def board
+    puts "Possible colors: #{@all_colors.join(", ")}"
+
+    puts @row
+    #@row = @old_row
+    #puts @row
+  #   @row = [["[X]", "[X]", "[X]", "[X]"],["[X]", "[X]", "[X]", "[X]"]]
+  #      @row.each { |subarray| subarray * 2 }
+  #      @row.map{ |subarray| subarray }.join
   end
 
   def lose
-    if @number_of_guesses == 9
+    if @number_of_guesses == @level
+      puts "I'm sorry. You have lost Mastermind."
       @lose = true
-      abort("You have lost.")
     end
   end
 
   def win
+    if @right_order == 4
+      puts "You win!"
+      @win = true
+    end
   end
 end
 
 def run
     mm = MasterMind.new
 
-  until mm.lose == true
+    puts "What level of difficulty would you like: easy, medium, hard?"
+    level = gets.chomp.downcase
+    mm.level_of_difficulty(level)
+
+  until mm.lose == true || mm.win == true
     puts mm.inspect
+    puts mm.board
     mm.reset_results
     mm.get_guess
   end
+  puts mm.board
 end
 
 run
