@@ -14,30 +14,35 @@ require 'colorize'
 
 class MasterMind
   def initialize
-    @all_colors = ["red", "blue", "black", "yellow", "green", "white", "magenta", "cyan"]
+    @all_colors = ["red", "blue", "yellow", "green", "white", "magenta", "cyan"]
+    @all_colors_in_color = colorize_choices
     @answer = answer
     @guess = [ ]
     @number_of_guesses = 0
-    @win = false
-    @lose = false
+    @over = false
     @right_color = 0
     @right_order = 0
     @level = 10
     @game_piece = nil
     @row = []
-    @old_row = nil
   end
 
   def answer
     @all_colors.sample(4)
   end
 
-  def colorize
+  def colorize_pieces
     add_color = @user_guess.to_sym
 
     @game_piece = "O".colorize(add_color)
     @row << @game_piece
     get_guess
+  end
+
+  def colorize_choices
+    @all_colors.map do |n|
+      n.colorize(n.to_sym)
+    end
   end
 
   def guess_to_array
@@ -46,7 +51,7 @@ class MasterMind
       get_guess
     else
       @guess << @user_guess
-      colorize
+      colorize_pieces
     end
   end
 
@@ -61,13 +66,15 @@ class MasterMind
   end
 
   def level_of_difficulty(level)
-
     if level.include?("easy")
       @level = 10
+      puts "You have 10 guesses."
     elsif level.include?("medium")
       @level = 8
+      puts "You have 8 guesses."
     elsif level.include?("hard")
       @level = 5
+      puts "You have 5 choices."
     else
       puts "I'm sorry. I don't understand."
     end
@@ -77,7 +84,7 @@ class MasterMind
     if @number_of_guesses <= @level
       @number_of_guesses += 1
     else
-      lose
+      over
     end
     return_results
   end
@@ -97,7 +104,7 @@ class MasterMind
       end
 
       if @answer == @guess
-        win
+        over
       end
 
       puts "You have #{@right_color} correct colors."
@@ -111,7 +118,7 @@ class MasterMind
   end
 
   def board
-    puts "Possible colors: #{@all_colors.join(", ")}"
+    puts "Possible colors: #{@all_colors_in_color.join(", ")}"
 
     puts @row
     #@row = @old_row
@@ -121,15 +128,12 @@ class MasterMind
   #      @row.map{ |subarray| subarray }.join
   end
 
-  def lose
-    if @number_of_guesses == @level
+  def over
+    case
+    when @number_of_guesses == @level
       puts "I'm sorry. You have lost Mastermind."
       @lose = true
-    end
-  end
-
-  def win
-    if @right_order == 4
+    when @right_order == 4
       puts "You win!"
       @win = true
     end
@@ -143,7 +147,7 @@ def run
     level = gets.chomp.downcase
     mm.level_of_difficulty(level)
 
-  until mm.lose == true || mm.win == true
+  until mm.over == true
     puts mm.inspect
     puts mm.board
     mm.reset_results
