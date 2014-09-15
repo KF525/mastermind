@@ -1,15 +1,3 @@
-#TO DO
-#DONEcreate a random combination of 4 colors from 8 colors
-#DONEallow for guesses
-#DONErespond to guesses - number of correct colors and number of colors in correct order
-#DONEoption to increase difficulty/reduce number of guesses
-#DONEif guess correctly => jumps to win
-#DONEinclude colorize option
-
-#create a board/reprint board
-#a way to quit the game
-
-
 require 'colorize'
 
 class MasterMind
@@ -92,7 +80,7 @@ class MasterMind
   end
 
   def return_results
-    #look into a shorter way to do this?
+    #I'm having trouble combining these two each statements.
       @answer.each_with_index do |color, index|
         if @guess.include?(color)
           @right_color += 1
@@ -122,18 +110,15 @@ class MasterMind
   def board
     puts "Possible colors: #{@all_colors_in_color.join(", ")}"
 
+    #I want to find a more successful way to represent the board
     puts @row
-    #@row = @old_row
-    #puts @row
-  #   @row = [["[X]", "[X]", "[X]", "[X]"],["[X]", "[X]", "[X]", "[X]"]]
-  #      @row.each { |subarray| subarray * 2 }
-  #      @row.map{ |subarray| subarray }.join
   end
 
   def over
     case
     when @number_of_guesses == @level
       puts "I'm sorry. You have lost Mastermind."
+      puts "The correct combination was #{@answer.join(', ')}."
       @lose = true
     when @right_order == 4
       puts "You win!"
